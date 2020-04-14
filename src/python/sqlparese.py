@@ -4,7 +4,7 @@ from sqlparse import sql
 from sqlparse.sql import IdentifierList, Identifier
 from sqlparse.tokens import Keyword, DML, DDL
 
-import neo_helper
+# import neo_helper
 
 ALL_JOIN_TYPE = ('LEFT JOIN', 'RIGHT JOIN', 'INNER JOIN', 'FULL JOIN', 'LEFT OUTER JOIN', 'FULL OUTER JOIN')
 
@@ -28,10 +28,10 @@ def get_table_name(query_tokens):
                     yield res
 
         if token.ttype is None and isinstance(token, sql.IdentifierList):
-            # print('-----------------------------------')
-            # print('Identifierlist:')
-            # for id in token.get_identifiers():
-            #     print(id)
+            print('-----------------------------------')
+            print('Identifierlist:')
+            for id in token.get_identifiers():
+                print(id)
             pass
 
         if (token.ttype is Keyword and token.value.upper() == 'FROM') or token.value.upper() in ALL_JOIN_TYPE:
@@ -39,12 +39,11 @@ def get_table_name(query_tokens):
             continue
 
         if token.match(None, 'select.*from.*', True):
+            print('*****',token.get_parent_name(),'------',token.get_real_name())
             for sub_token in token.get_sublists():
-                subsql = sub_token.value.replace('(', '').replace(')', '')
-                sub_tokens = sqlparse.parse(subsql)[0]
-                t = get_table_name(sub_tokens)
-                for i in t :
-                    yield i
+
+                print(sub_token)
+
 
 
 def get_create(query_tokens):
@@ -76,5 +75,5 @@ with open('sample.sql', 'r', encoding='utf8') as sqlstr:
         parents = list(get_table_name(query_tokens))
         print(son)
         print(parents)
-        neo_helper.save_table_from(son,parents)
+        # neo_helper.save_table_from(son,parents)
 
